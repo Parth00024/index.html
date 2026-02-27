@@ -1,6 +1,6 @@
 <script>
 
-const CSV_URL = "https://docs.google.com/spreadsheets/d/1KdSahdmSit355aQDZ1vNNu6ZgiQpQMnKENoQ-HiPYg0/export?format=csv";
+const CSV_URL = "https://docs.google.com/spreadsheets/d/1KdSahdmSit355aQDZ1vNNu6ZgiQpQMnKENoQ-HiPYg0/gviz/tq?tqx=out:csv";
 
 const params = new URLSearchParams(window.location.search);
 const certId = params.get("id");
@@ -11,7 +11,10 @@ if (!certId) {
 } else {
 
   fetch(CSV_URL)
-    .then(response => response.text())
+    .then(response => {
+      if (!response.ok) throw new Error("Network response was not ok");
+      return response.text();
+    })
     .then(data => {
 
       const rows = data.trim().split("\n");
@@ -45,6 +48,11 @@ if (!certId) {
         document.getElementById("result").innerHTML =
           "<h3 class='invalid'>❌ Invalid Certificate</h3>";
       }
+    })
+    .catch(error => {
+      document.getElementById("result").innerHTML =
+        "<h3 class='invalid'>Error loading verification data</h3>";
+      console.error(error);
     });
 }
 
