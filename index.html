@@ -1,59 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Certificate Verification</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    margin-top: 80px;
+  }
+  .valid { color: green; }
+  .invalid { color: red; }
+</style>
+</head>
+<body>
+
+<h2>Certificate Verification</h2>
+<div id="result">Checking certificate...</div>
+
 <script>
 
-const CSV_URL = "https://docs.google.com/spreadsheets/d/1KdSahdmSit355aQDZ1vNNu6ZgiQpQMnKENoQ-HiPYg0/gviz/tq?tqx=out:csv";
+// 🔴 ADD YOUR CERTIFICATES HERE
+const certificates = {
+  "SG2026-A1D92242": {
+    name: "Rahul Patel",
+    event: "Sovereign's Gambit"
+  },
+  "SG2026-B3X7F921": {
+    name: "Mehul Shah",
+    event: "Sovereign's Gambit"
+  }
+};
 
+// Get ID from URL
 const params = new URLSearchParams(window.location.search);
 const certId = params.get("id");
 
 if (!certId) {
   document.getElementById("result").innerHTML =
     "<h3 class='invalid'>Invalid Request</h3>";
+} else if (certificates[certId]) {
+
+  const data = certificates[certId];
+
+  document.getElementById("result").innerHTML =
+    "<h3 class='valid'>✅ Certificate Verified</h3>" +
+    "<p><strong>Name:</strong> " + data.name + "</p>" +
+    "<p><strong>Event:</strong> " + data.event + "</p>" +
+    "<p><strong>Certificate ID:</strong> " + certId + "</p>";
+
 } else {
 
-  fetch(CSV_URL)
-    .then(response => {
-      if (!response.ok) throw new Error("Network response was not ok");
-      return response.text();
-    })
-    .then(data => {
-
-      const rows = data.trim().split("\n");
-      const headers = rows[0].split(",");
-
-      const certCol = headers.indexOf("cert_id");
-      const nameCol = headers.indexOf("name");
-      const eventCol = headers.indexOf("event");
-
-      let found = false;
-
-      for (let i = 1; i < rows.length; i++) {
-
-        const cols = rows[i].split(",");
-
-        if (cols[certCol] && cols[certCol].trim() === certId.trim()) {
-
-          found = true;
-
-          document.getElementById("result").innerHTML =
-            "<h3 class='valid'>✅ Certificate Verified</h3>" +
-            "<p><strong>Name:</strong> " + cols[nameCol] + "</p>" +
-            "<p><strong>Event:</strong> " + cols[eventCol] + "</p>" +
-            "<p><strong>Certificate ID:</strong> " + certId + "</p>";
-
-          break;
-        }
-      }
-
-      if (!found) {
-        document.getElementById("result").innerHTML =
-          "<h3 class='invalid'>❌ Invalid Certificate</h3>";
-      }
-    })
-    .catch(error => {
-      document.getElementById("result").innerHTML =
-        "<h3 class='invalid'>Error loading verification data</h3>";
-      console.error(error);
-    });
+  document.getElementById("result").innerHTML =
+    "<h3 class='invalid'>❌ Invalid Certificate</h3>";
 }
 
 </script>
+
+</body>
+</html>
